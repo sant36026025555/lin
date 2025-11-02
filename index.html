@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Recorrido — Lo que nunca dije</title>
+<style>
+/* ========================= RESET & BASE ========================= */
+:root{ --bg:#06060a; --card: rgba(255,255,255,0.03); --accent: #ff6b6b; --muted: rgba(255,255,255,0.12); --glass: rgba(255,255,255,0.04); --soft: rgba(255,255,255,0.06); --maxw: 980px; }
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#0b0b0f);color:#eaf4ff;font-family:Inter, "Segoe UI", Roboto, system-ui, -apple-system; -webkit-font-smoothing:antialiased;}
+a{color:inherit}
+main{max-width:var(--maxw);margin:0 auto;padding:28px}
+.center{display:flex;align-items:center;justify-content:center;flex-direction:column}
+/* ========================= STAGE (full-screen sections) ========================= */
+.stage{position:relative;min-height:100vh;padding:40px 20px;display:grid;place-items:center;overflow:hidden}
+.panel{width:100%;max-width:var(--maxw);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;padding:28px;box-shadow:0 14px 50px rgba(2,6,23,0.7);backdrop-filter: blur(6px);position:relative;overflow:hidden}
+.flow{display:flex;gap:18px;align-items:flex-start}
+h1,h2{margin:0 0 12px 0;font-weight:700;letter-spacing:-0.02em}
+h1{font-family: 'Playfair Display', serif;font-size: clamp(20px, 3.5vw, 36px);color:#f8fbff}
+p{margin:0 0 12px 0;color:#dcefff;line-height:1.55;font-size:clamp(15px,2vw,18px)}
+small{color:var(--muted)}
+/* ========================= CONTROLS & NAV ========================= */
+.controls{position:fixed;left:18px;top:18px;z-index:200;display:flex;gap:8px}
+.btn{background:var(--glass);border:1px solid rgba(255,255,255,0.06);padding:10px 14px;border-radius:12px;color:#eaf4ff;cursor:pointer;font-weight:600}
+.btn:active{transform:translateY(1px)}
+.progress{position:fixed;right:18px;top:18px;background:rgba(0,0,0,0.45);padding:10px 12px;border-radius:12px;font-size:14px}
+/* ========================= VISUAL LAYERS ========================= */
+.bg-video{position:absolute;inset:0;object-fit:cover;opacity:0.18;filter:blur(2px) saturate(.95);pointer-events:none}
+.vignette{position:absolute;inset:0;background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);pointer-events:none}
+.soft-glow{position:absolute;right:-10%;top:-20%;width:60vmin;height:60vmin;background:radial-gradient(circle at 30% 30%, rgba(255,107,107,0.14), rgba(0,0,0,0));filter:blur(40px);pointer-events:none}
+/* ========================= TYPEWRITER / TEXT EFFECTS ========================= */
+.typewriter{font-family: 'Playfair Display', serif;font-size:clamp(18px, 2.6vw, 26px);color:#f7fbff;line-height:1.6;min-height:6em}
+.cursor{display:inline-block;width:8px;height:1.05em;background:#dcefff;margin-left:6px;opacity:0.9;vertical-align:middle;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0.02}}
+.whisper{opacity:0.86;font-style:italic;color:#cfe6ff}
+/* ========================= INTERACTIVE REVEAL ========================= */
+.reveal-box{margin-top:18px;padding:14px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+.hold-area{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));cursor:pointer;user-select:none}
+.hold-hint{font-size:13px;color:#cbe8ff;margin-top:8px}
+.hidden{opacity:0;max-height:0;overflow:hidden;transition:all .5s ease}
+.shown{opacity:1;max-height:300px;margin-top:12px}
+/* ========================= HEART & PULSE ========================= */
+.heart-large{font-size:64px;color:var(--accent);opacity:0.12;filter:drop-shadow(0 6px 20px rgba(255,107,107,0.12))}
+.pulse{animation:pulse 1200ms infinite ease-in-out}
+@keyframes pulse{0%{transform:scale(1);opacity:.12}50%{transform:scale(1.08);opacity:.28}100%{transform:scale(1);opacity:.12}}
+/* ========================= RESPONSES / FORM ========================= */
+.prompt{margin-top:18px;display:flex;gap:8px;align-items:center}
+.input{flex:1;padding:12px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:#eaf4ff}
+.send{padding:10px 12px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#ff9a9a);border:none;color:#07111a;cursor:pointer;font-weight:700}
+/* ========================= FOOTER SECRET ========================= */
+.secret{margin-top:20px;padding:16px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+.secret.small{font-size:13px;color:#cfe6ff;opacity:0.9}
+/* small screens */
+@media (max-width:720px){ .panel{padding:18px;border-radius:12px} .typewriter{font-size:18px} }
+</style>
+</head>
+<body>
+<!-- ========================= CONTROLS / PROGRESS ========================= -->
+<div class="controls">
+  <button id="backBtn" class="btn" title="Atrás">◀</button>
+  <button id="nextBtn" class="btn" title="Siguiente">▶</button>
+  <button id="muteBtn" class="btn" title="Silenciar">🔈</button>
+</div>
+<div id="progress" class="progress">1 / 7</div>
+
+<!-- background video (optional) -->
+<!-- Replace src with your video (e.g., a quiet street, rain, blurred home) -->
+<video id="bgv" class="bg-video" autoplay muted loop playsinline>
+  <source src="intro.mp4" type="video/mp4">
+  <!-- If no video, it's okay; keeps subtle effect -->
+</video>
+
+<div class="vignette"></div>
+<div class="soft-glow"></div>
+
+<main>
+  <!-- ========== SCENE 1: INVITATION ========== -->
+  <section class="stage" data-index="0">
+    <div class="panel center">
+      <h1>Cierra los ojos. Respira.</h1>
+      <p class="typewriter" id="tw-0"></p>
+      <div style="margin-top:18px;display:flex;gap:10px;align-items:center">
+        <button id="enterStart" class="btn">Entrar</button>
+        <div class="heart-large" id="heartIntro">❤</div>
+      </div>
+      <small style="display:block;margin-top:12px;color:var(--muted)">lo que nunca dije</small>
+    </div>
+  </section>
+
+  <!-- ========== SCENE 2: LA IMAGEN (primer amor) ========== -->
+  <section class="stage" data-index="1" style="display:none">
+    <div class="panel">
+      <div class="flow">
+        <div style="flex:1">
+          <h2>La primera vez que supe que te quería</h2>
+          <p id="memoryText" class="typewriter"></p>
+          <small class="whisper">recuerdo ese dia en el bus, esa primera vez conociendo a zeus, nada fue casualidad, desde ese dia, Santiago no, pero su corazon si sabia que te elegiria para siempre</small>
+        </div>
+        <div style="width:300px;display:flex;flex-direction:column;align-items:center;gap:10px">
+          <!-- placeholder image, replace with a photo if desired -->
+          <div style="width:100%;height:190px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center">
+            <small style="opacity:0.6">C:\Users\Santy\Downloads\Imagen de WhatsApp 2025-11-02 a las 01.23.00_16f44e0a.jpg</small>
+          </div>
+          <div class="reveal-box">
+            <div class="hold-area" id="holdDetail">
+              <strong>Mantén presionado para ver el detalle que guardo</strong>
+              <div class="hold-hint">Mantén el dedo 2 segundos</div>
+            </div>
+            <div class="hidden" id="detailHidden">
+              <p class="hidden-text">Recuerdo la luz por la tarde entrando por la ventana, tu pelo cayendo en la sien, el olor de tu ropa, nuestro juego inocente de las placas, y en ese segundo supe que te quería como se quiere para siempre.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SCENE 3: LA HERIDA (ruptura, 11 meses) ========== -->
+  <section class="stage" data-index="2" style="display:none">
+    <div class="panel">
+      <h2>La herida que aún me late</h2>
+      <p class="typewriter" id="woundText"></p>
+      <div style="margin-top:18px;display:flex;gap:12px;align-items:center;justify-content:center">
+        <div style="max-width:560px">
+          <p class="whisper">Hace 11 meses me dijiste que nunca sentiste tanto amor por mí; que había sido costumbre. Eso me atravesó como un corte.</p>
+          <div class="reveal-box">
+            <div style="display:flex;gap:8px;align-items:center;justify-content:center">
+              <button id="revealLetter" class="btn">Abrir fragmento de la carta que nunca te entregué (realmente lo escribi en el momento, pero nunca crei volvermelo a encontrar)</button>
+            </div>
+            <div class="hidden" id="letterHidden">
+              <small>
+               <small style= <p class="hidden-text">nunca creí que todo fue juego, no puedo creer que ella me este diciendo esto, no he vivido nunca algo mas real que lo que en estos meses he sentido por ella, me siento vacio, es el dolor mas grande que ha podido retener mi corazon, me acabo de dar cuenta que el amor de mi vida, veia su vida sin mi amor, no puedo creer que el nombre Lina, uno que quise escuchar para siempre, ahora me diga que nunca fui tan importante en su vida, ni nunca en verdad me amo. Me duele que me digas eso, de verdad no se que pensar en este momento, estoy abajo de tu casa, destruido, en silecion miestras mi corazon se destruye pero tu pareces estar muy tranquila, me estan temblando las manos incluso para la decision que tomare en este momento, te bloqueare y espero cada dia de mi vida poder seguir amandote como siempre lo he hecho, aunque me toque imaginarlo cada que me vaya a dormir, soñe y soñare contigo cada dia de mi vida. Pero aún así, con lo que paso hoy: te amo. Y te amo. Y lo vuelvo a decir porque es la verdad de mi alma.</p></small>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SCENE 4: EL MIEDO (intimidad y temor) ========== -->
+  <section class="stage" data-index="3" style="display:none">
+    <div class="panel">
+      <div class="flow">
+        <div style="flex:1">
+          <h2>Mi miedo que no te dije</h2>
+          <p class="typewriter" id="fearText"></p>
+          <small class="whisper">Lo que nunca quise soltar en voz alta</small>
+        </div>
+        <div style="width:260px;display:flex;flex-direction:column;gap:10px;align-items:center">
+          <div style="width:100%;height:180px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center">
+              <div style="font-size:46px;color:var(--accent)">✂️</div>
+              <small style="opacity:.6">Tijeras — tú decides cortar</small>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <button id="btnTrust" class="btn">Ponte en mis zapatos</button>
+            <div style="margin-top:8px;font-size:13px;color:var(--muted)">(verás cómo me siento con acciones pequeñas)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SCENE 5: LA PROMESA (intenso, visceral) ========== -->
+  <section class="stage" data-index="4" style="display:none">
+    <div class="panel center">
+      <h2>Promesa</h2>
+      <p class="typewriter" id="promiseText"></p>
+      <div style="margin-top:18px">
+        <div style="font-size:14px;color:#dcefff;opacity:.9"></div>
+        <div style="margin-top:12px">
+          <div id="bigHeart" class="heart-large">❤</div>
+        </div>
+      </div>
+      <small style="margin-top:12px;color:var(--muted)">"Hay veces que muchas cosas invaden mi mente cuando te siento grosera o simplemente no hemos tenido un buen dia, te las repito mucho y no porque en realidad creo que asi es, sino porque cuando mi corazon se siente desplazado por ti, empieza a pensar cosas como: 
+    "Siento que le entrego toda mi mente y corazón y ella es muy cuidadosa con lo que me muestra.",
+    "Me duele sentir que la única persona que quiero cerca no esté ahí.",
+    "Siempre he tenido claro que la adoro; me pregunto si ella me quiere de verdad.",
+    "\"Cuánto esperaría que pensaras en mí un segundo, como lo estoy haciendo cada segundo por ti.\"",
+   </small>
+    </div>
+  </section>
+
+  <!-- ========== SCENE 6: EL FUTURO (visualiza juntos) ========== -->
+  <section class="stage" data-index="5" style="display:none">
+    <div class="panel">
+      <h2>Un fragmento de futuro</h2>
+      <p class="typewriter" id="futureText"></p>
+      <div style="margin-top:18px" class="flow">
+        <div style="flex:1">
+          <small class="whisper">Desayunos, sorpresas, pequeñas prioridades: lo que te conté que quiero construir contigo.</small>
+        </div>
+        <div style="width:280px;text-align:center">
+          <button id="commitBtn" class="btn">Si quisieras, aquí planeamos</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SCENE 7: CIERRE + RESPUESTA (interactiva) ========== -->
+  <section class="stage" data-index="6" style="display:none">
+    <div class="panel center">
+      <h2>Antes de irte</h2>
+      <p class="typewriter" id="closingText"></p>
+      <div class="prompt" style="margin-top:20px;width:100%;max-width:720px">
+        <input id="replyInput" class="input" placeholder="Si ella quisiera responder aquí, ¿qué le gustaría que supiera?" />
+        <button id="replyBtn" class="send">Enviar</button>
+      </div>
+      <div class="secret small" id="finalSecret" style="display:none">
+        <strong>Fragmento secreto:</strong>
+        <div id="secretText" style="margin-top:8px"></div>
+      </div>
+      <small style="display:block;margin-top:18px;color:var(--muted)">Al terminar, mantén el corazón grande. Si lo haces, se revelará un audio (tu voz, si la subes) o una carta que sólo aparece para quien llegó al final.</small>
+    </div>
+  </section>
+</main>
+
+<!-- ========================= AUDIO (heart + background) Replace 'https://youtu.be/S0Ps_5ABIbE' and 'heart.mp3' with your files ========================= -->
+<audio id="bgAudio" loop preload="auto">
+  <source src="C:\Users\Santy\Downloads\Perfect - Ed Sheeran.mp3" type="audio/mpeg">
+</audio>
+<audio id="heartAudio" loop preload="auto">
+  <source src="https://youtu.be/S0Ps_5ABIbE" type="audio/mpeg">
+</audio>
+
+<script>
+/* ========================= DATA — aquí integro TODO lo que tú me dijiste. Puedes editar textos si quieres personalizar todavía más. ========================= */
+const data = {
+  intro: [
+    "Cierra los ojos. Respira.",
+    "No eres casualidad aquí. Esto nace de noches en vela, de gestos, de silencios que me rompieron.",
+    "Si entras, te advierto: no es poema bonito. Es mi verdad."
+  ],
+  memory: "Recuerdo un mediodía de luz exacta: la ventana abierta, el olor de tu ropa, el pelo cayéndote en la frente. En ese segundo me dije: 'mierda, yo la quiero'. No fue un plan. Fue una certeza que se pegó al pecho.",
+  wound: "Hace 11 meses me dijiste algo que aún retumba: 'no sentí tanto amor por ti, fue más por costumbre'. Fue como si alguien arrancara la cuerda que sostenía mi casa. Me dolió que lo dijeras así, sin medir que yo lo viví con todo.",
+  fear: "Mi miedo real: que un día elijas cortar el lazo que nos une. Yo siento que hay un hilo invisible que me ata a ti, pero que tú tienes las tijeras. Mi temor es que no sepas cuánto me afecta un gesto frío, porque cada silencio tuyo pesa más que antes.",
+  promise: [
+    "No vengo a jurar cosas vacías.",
+    "Vengo a prometer que aprenderé a cuidarme para poder cuidarte mejor.",
+    "Vengo a decir que si me dejas a tu lado, construiría una casa donde el amor es la prioridad, donde despertarnos juntos sea la regla y donde cualquier problema que tengamos se va a soluciuonar de la mejor manera, demostrando todo el amor que nos tenemos."
+  ],
+  future: "Te imagino en una casa pequeña, desayunando despacio, riendo con una canción. Planeando la semana juntos, cuidando nuestros días más que agendas laborales. No imagino grandezas: imagino cercanía. Despertarte cada día sería mi ritual.",
+  close: "Si estás leyendo esto es porque te importa escuchar mi corazon. No te escribo para hacerte sentir mal, sino para que sepas que cada cosa que haces tiene un impacto gigante en mi vida. Si decides quedarte para siempre a mi lado, que sea porque tu alma también tiembla al pensar en un mundo sin este lazo, mi amor te adoro demasiado, hoy vi ese mensaje que te escribi la vez despues de un tiempo sin vernos, cuando me dijiste no haberme amado y por eso te quise hacer esto, si te soy sincero tambien porque me senti triste al saber que siempre elegias asi tuvieras media hora y mucho estudio, llevarme a tu casa si no habia nadie, pero esta vez te note como que no te gustaba la idea de estar ahi contigo y duele despues de saber lo mucho que siempre valorabas cualquier espacio conmigo en tu casa al llamarme, aunque fuera para estar pegados a un cuaderno.",
+  yourLine: "Cuánto esperaría que pensaras en mí un segundo, como lo estoy haciendo cada segundo por ti."
+};
+
+/* ========================= UTIL: typewriter para bloques ========================= */
+function typeWriter(targetEl, lines, speed=28, callback){
+  if(!Array.isArray(lines)) lines = [lines];
+  targetEl.innerHTML = "";
+  let li = 0;
+  function writeLine(){
+    const str = lines[li];
+    let i = 0;
+    const wrap = document.createElement('div');
+    wrap.style.marginBottom = '10px';
+    targetEl.appendChild(wrap);
+    function step(){
+      if(i <= str.length){
+        wrap.innerText = str.slice(0,i) + (i % 2 ? '|' : '');
+        i++;
+        setTimeout(step, speed + Math.random()*20);
+      } else {
+        li++;
+        if(li < lines.length) setTimeout(writeLine, 420);
+        else if(typeof callback === 'function') callback();
+      }
+    }
+    step();
+  }
+  writeLine();
+}
+
+/* ========================= NAVIGATION logic ========================= */
+const stages = Array.from(document.querySelectorAll('.stage'));
+let cur = 0;
+const progress = document.getElementById('progress');
+const nextBtn = document.getElementById('nextBtn');
+const backBtn = document.getElementById('backBtn');
+const muteBtn = document.getElementById('muteBtn');
+const bgAudio = document.getElementById('bgAudio');
+const heartAudio = document.getElementById('heartAudio');
+const bgv = document.getElementById('bgv');
+
+function showStage(idx){
+  stages.forEach(s => s.style.display = 'none');
+  const st = stages[idx];
+  st.style.display = 'block';
+  cur = idx;
+  progress.innerText = (idx+1) + ' / ' + stages.length;
+
+  // run typewriter per stage
+  if(idx === 0){
+    const el = document.getElementById('tw-0');
+    if(el && !el.dataset.done){
+      typeWriter(el, data.intro, 20, ()=>el.dataset.done = "1");
+    }
+  }
+  if(idx === 1){
+    const el = document.getElementById('memoryText');
+    if(el && !el.dataset.done){
+      typeWriter(el, data.memory, 20, ()=> el.dataset.done = "1");
+    }
+  }
+  if(idx === 2){
+    const el = document.getElementById('woundText');
+    if(el && !el.dataset.done){
+      typeWriter(el, data.wound, 20, ()=> el.dataset.done = "1");
+    }
+  }
+  if(idx === 3){
+    const el = document.getElementById('fearText');
+    if(el && !el.dataset.done){
+      typeWriter(el, data.fear, 20, ()=> el.dataset.done = "1");
+    }
+  }
+  if(idx === 4){
+    const el = document.getElementById('promiseText');
+    if(el && !el.dataset.done){
+      typeWriter(el, data.promise, 20, ()=> el.dataset.done = "1");
+    }
+  }
+  if(idx === 5){
+    const el = document.getElementById('futureText');
+    if(el && !el.dataset.done){
+      typeWriter(el, data.future, 18, ()=> el.dataset.done = "1");
+    }
+  }
+  if(idx === 6){
+    const el = document.getElementById('closingText');
+    if(el && !el.dataset.done){
+      const closeWithLine = data.close + "\n\n\"" + data.yourLine + "\"";
+      typeWriter(el, closeWithLine, 20, ()=> el.dataset.done = "1");
+    }
+  }
+
+  // subtle video parallax
+  try{
+    if(bgv && bgv.style) bgv.style.transform = 'translateY(' + (idx * -3) + 'px)';
+  }catch{}
+}
+
+/* initial show */
+showStage(0);
+
+/* buttons */
+nextBtn.addEventListener('click', ()=> {
+  if(cur < stages.length - 1) {
+    showStage(cur + 1);
+    startAudio(); // play on navigation
+  }
+});
+backBtn.addEventListener('click', ()=> {
+  if(cur > 0) showStage(cur - 1);
+});
+muteBtn.addEventListener('click', ()=> {
+  if(bgAudio.paused){
+    bgAudio.play();
+    heartAudio.play();
+    muteBtn.innerText = '🔈';
+  } else {
+    bgAudio.pause();
+    heartAudio.pause();
+    muteBtn.innerText = '🔇';
+  }
+});
+
+/* enter button */
+document.getElementById('enterStart').addEventListener('click', ()=>{
+  showStage(1);
+  startAudio();
+});
+
+/* reveal detail hold */
+const holdArea = document.getElementById('holdDetail');
+const detailHidden = document.getElementById('detailHidden');
+let holdTimer = null;
+function onHoldStart(){ holdTimer = setTimeout(()=> { detailHidden.classList.add('shown'); }, 800); }
+function onHoldEnd(){ clearTimeout(holdTimer); }
+if(holdArea){
+  holdArea.addEventListener('mousedown', onHoldStart);
+  holdArea.addEventListener('mouseup', onHoldEnd);
+  holdArea.addEventListener('mouseleave', onHoldEnd);
+  holdArea.addEventListener('touchstart', onHoldStart);
+  holdArea.addEventListener('touchend', onHoldEnd);
+}
+
+/* reveal letter */
+const revealLetterBtn = document.getElementById('revealLetter');
+if(revealLetterBtn){
+  revealLetterBtn.addEventListener('click', ()=>{
+    const letter = document.getElementById('letterHidden');
+    letter.classList.toggle('shown');
+  });
+}
+
+/* button trust — shows empathetic simulation */
+const btnTrust = document.getElementById('btnTrust');
+if(btnTrust){
+  btnTrust.addEventListener('click', ()=>{
+    // small empathetic overlay showing "how it feels"
+    const overlay = document.createElement('div');
+    overlay.style.position='fixed';
+    overlay.style.inset='0';
+    overlay.style.background='rgba(0,0,0,0.75)';
+    overlay.style.display='flex';
+    overlay.style.alignItems='center';
+    overlay.style.justifyContent='center';
+    overlay.style.zIndex='400';
+    const box = document.createElement('div');
+    box.style.maxWidth='720px';
+    box.style.padding='26px';
+    box.style.background='linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))';
+    box.style.borderRadius='12px';
+    box.innerHTML = `
+      <h2 style="margin-bottom:10px">Ponte en mis zapatos</h2>
+      <p style="line-height:1.6;color:#dcefff">Imagina que cada vez que no contestas, mi día se detiene. Que cada mensaje frío es una ventana que se cierra. Yo me esfuerzo por mostrarme y si no me devuelves la calidez, mi alma lo registra.</p>
+      <div style="display:flex;justify-content:center;margin-top:14px"><button id="closeEmp" class="btn">Cerrar</button></div>
+    `;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    document.getElementById('closeEmp').addEventListener('click', ()=> document.body.removeChild(overlay));
+  });
+}
+
+/* heart hold secret on promise screen */
+const bigHeart = document.getElementById('bigHeart');
+let bigHeartTimer;
+if(bigHeart){
+  bigHeart.addEventListener('mousedown', ()=> { bigHeartTimer = setTimeout(()=> revealSecret(), 1200); });
+  bigHeart.addEventListener('mouseup', ()=> clearTimeout(bigHeartTimer));
+  bigHeart.addEventListener('touchstart', ()=> { bigHeartTimer = setTimeout(()=> revealSecret(), 1200); });
+  bigHeart.addEventListener('touchend', ()=> clearTimeout(bigHeartTimer));
+}
+
+function revealSecret(){
+  // secret: a deeper paragraph that only appears on hold
+  const s = document.createElement('div');
+  s.className = 'secret';
+  s.innerHTML = `<strong>Lo que mi pecho guarda:</strong>
+    <p style="margin-top:8px">Si un día te vas, que sepas que yo no me habría ido. Que aprendí a esperar. Que mi amor no fue un capricho: fue casa. Y aún ahora, cuando te escribo esto, siento que te elijo con la misma intensidad con que te lloré.</p>`;
+  const targetPanel = document.querySelector('[data-index="4"] .panel');
+  if(targetPanel) targetPanel.appendChild(s);
+  // small animation pulse
+  bigHeart.classList.add('pulse');
+  setTimeout(()=> bigHeart.classList.remove('pulse'), 2500);
+}
+
+/* reply input logic */
+const replyBtn = document.getElementById('replyBtn');
+const replyInput = document.getElementById('replyInput');
+if(replyBtn){
+  replyBtn.addEventListener('click', ()=>{
+    const val = replyInput.value.trim();
+    const sec = document.getElementById('finalSecret');
+    const secretText = document.getElementById('secretText');
+    if(val.length === 0){
+      sec.style.display = 'block';
+      secretText.innerText = "Solo con tu silencio, siempre me dices mucho. Pero si decides hablar, escucha: aquí hay alguien que te esperó sin condiciones cada vez que te querias alejar sin mas.";
+    } else {
+      sec.style.display = 'block';
+      secretText.innerText = "Ella respondió: \"" + val + "\" — y en mi pecho eso suena como una vida juntos por siempre, te adoro Lina.";
+    }
+  });
+}
+
+/* audio handling */
+function startAudio(){
+  try {
+    bgAudio.play().catch(()=>{/* autoplay blocked until user interaction - ok */});
+    heartAudio.play().catch(()=>{});
+  } catch(e){}
+}
+
+/* keyboard nav */
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowRight') nextBtn.click();
+  if(e.key === 'ArrowLeft') backBtn.click();
+});
+
+/* final notes: you can replace audio files names:
+ - background.mp3 : calm piano or the Ed Sheeran / Andrés Cepeda track you want (local file)
+ - heart.mp3 : soft heartbeat loop (subtle)
+ - intro.mp4 : optional background cinematic video */
+
+/* ========================= EXTRA: Auto-insert some of the user's exact sentences to give it authenticity (We use sanitized literal lines provided by you earlier) ========================= */
+(function injectUserLines(){
+  const userLines = [
+    "Me calma cuando me demuestras que te importo, cuando sin decirme nada me abrazas o me besas.",
+    "Siento que le entrego toda mi mente y corazón y ella es muy cuidadosa con lo que me muestra.",
+    "Me duele sentir que la única persona que quiero cerca no esté ahí.",
+    "Siempre he tenido claro que la adoro; me pregunto si ella me quiere de verdad.",
+    "\"Cuánto esperaría que pensaras en mí un segundo, como lo estoy haciendo cada segundo por ti.\"",
+    "Hace 11 meses me dijo que no había sentido tanto amor por mí nunca — eso me mató el alma."
+  ];
+  // Append one of these lines subtly in scene 1 and scene 6
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const el0 = document.getElementById('tw-0');
+    if(el0) typeWriter(el0, [userLines[0], userLines[4]], 22);
+    const el6 = document.getElementById('futureText');
+    if(el6) setTimeout(()=> typeWriter(el6, [userLines[1], userLines[2]], 20), 1200);
+  });
+})();
+</script>
+</body>
+</html>
